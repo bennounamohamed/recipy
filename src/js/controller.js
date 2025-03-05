@@ -1,3 +1,6 @@
+import * as model from './model.js';
+import recipeView from './views/recipeView.js';
+
 import icons from 'url:../img/icons.svg';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
@@ -79,24 +82,6 @@ const renderSearchResults = function (searchResult) {
            `;
     searchResultsDiv.appendChild(li);
   });
-};
-
-const getRecipeDetails = async function (id) {
-  renderSpinner(recipeContainer);
-  try {
-    const res = await fetch(
-      `https://forkify-api.herokuapp.com/api/v2/recipes/${id}`
-    );
-
-    if (!res.ok) throw new Error(`Failed to get recipe: ${res.status}`);
-
-    const data = await res.json();
-
-    return data;
-  } catch (err) {
-    alert(err);
-    return null;
-  }
 };
 
 const renderFinalRecipe = function (recipe) {
@@ -201,6 +186,20 @@ const renderFinalRecipe = function (recipe) {
   recipeContainer.insertAdjacentHTML('afterbegin', markup);
 };
 
+const getRecipeDetails = async function (id) {
+  renderSpinner(recipeContainer);
+  // Load Recipe
+  try {
+    await model.loadRecipe(id);
+    const recipe = model.state.recipe.recipe;
+    if (!recipe) throw new Error('Failed to get recipe from the state.');
+
+    renderFinalRecipe(recipe);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 /*
 const renderError = function (error) {
   recipeContainer.innerHTML = '';
@@ -224,12 +223,7 @@ const getFinalRecipe = async function (target) {
 
   if (target && target.dataset.id) {
     const id = target.dataset.id;
-    const data = await getRecipeDetails(id);
-    if (data) {
-      const finalRecipe = data['data']['recipe'];
-      console.log(finalRecipe);
-      renderFinalRecipe(finalRecipe);
-    }
+    getRecipeDetails(id);
   } else {
     console.error('<a> has no data-id attribute');
   }
