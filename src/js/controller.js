@@ -1,12 +1,10 @@
 import * as model from './model.js';
 import recipeView from './views/recipeView.js';
+import searchView from './views/searchView.js';
 
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
-const API_KEY = 'fa44fa6c-502e-4624-9e90-2f4c108b8361';
-
-const recipeContainer = document.querySelector('.recipe');
 const searchInput = document.querySelector('.search__field');
 const searchBtn = document.querySelector('.search__btn');
 const searchResultsDiv = document.querySelector('.results');
@@ -26,29 +24,6 @@ const timeout = function (s) {
 // https://forkify-api.herokuapp.com/v2
 
 ///////////////////////////////////////
-
-let searchResult;
-
-const getData = async function (item) {
-  try {
-    const res = await fetch(
-      `https://forkify-api.herokuapp.com/api/v2/recipes?search=${item}&key=${API_KEY}`
-    );
-
-    if (!res.ok) throw new Error('Failed to get data. Please try again!');
-
-    const data = await res.json();
-
-    const result = data.data.recipes;
-
-    if (result.length === 0)
-      throw new Error('Invalid search Term, please try again!');
-
-    return result;
-  } catch (err) {
-    alert(err);
-  }
-};
 
 const renderSearchResults = function (searchResult) {
   if (!searchResult) return;
@@ -85,21 +60,6 @@ const controlRecipes = async function (id) {
   }
 };
 
-/*
-const renderError = function (error) {
-  recipeContainer.innerHTML = '';
-  const div = document.createElement('div');
-  div.classList = 'error';
-  div.innerHTML = `
-            <div>
-              <svg>
-                <use href="${icons}#icon-alert-triangle"></use>
-              </svg>
-            </div>
-            <p>${error}</p>`;
-  recipeContainer.appendChild(div);
-}; */
-
 const getFinalRecipe = async function (target) {
   // Traverse up to find the closest <a> element
   while (target && target.tagName !== 'A') {
@@ -120,11 +80,12 @@ searchBtn.addEventListener('click', async function (e) {
   if (searchValue === '') return alert('Search field cannot be empty.');
 
   try {
-    searchResult = await getData(searchValue);
+    await model.getData(searchValue);
+    const data = model.state.searchResults;
 
     // Clean search render before rendering new one
     searchResultsDiv.innerHTML = '';
-    renderSearchResults(searchResult);
+    renderSearchResults(data);
   } catch (err) {
     console.error(err);
   }
