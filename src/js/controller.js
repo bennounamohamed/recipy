@@ -25,33 +25,13 @@ const timeout = function (s) {
 
 ///////////////////////////////////////
 
-const renderSearchResults = function (searchResult) {
-  if (!searchResult) return;
-  searchResult.forEach(item => {
-    const li = document.createElement('li');
-    li.classList = 'preview';
-    li.innerHTML = ` 
-            <a class="preview__link preview__link--active" href="#23232" data-id=${item.id}>
-              <figure class="preview__fig">
-                <img src=${item.image_url} alt="Test" />
-              </figure>
-              <div class="preview__data">
-                <h4 class="preview__title">${item.title}</h4>
-                <p class="preview__publisher">${item.publisher}</p>
-              </div>
-            </a>
-           `;
-    searchResultsDiv.appendChild(li);
-  });
-};
-
 const controlRecipes = async function (id) {
   recipeView.renderSpinner();
   // Load Recipe
   try {
     await model.loadRecipe(id);
     const recipe = model.state.recipe.recipe;
-    if (!recipe) throw new Error('Failed to get recipe from the state.');
+    if (!recipe) throw new Error('Failed to get recipe from the server.');
 
     // Render Recipe
     recipeView.render(recipe);
@@ -76,16 +56,19 @@ const getFinalRecipe = async function (target) {
 
 searchBtn.addEventListener('click', async function (e) {
   e.preventDefault();
+  // Get search input
   const searchValue = searchInput.value.trim();
   if (searchValue === '') return alert('Search field cannot be empty.');
 
+  searchView.renderSpinner();
+
+  // Render Search Results
   try {
     await model.getData(searchValue);
     const data = model.state.searchResults;
+    if (!data) throw new Error('Failed to get recipes from the server.');
 
-    // Clean search render before rendering new one
-    searchResultsDiv.innerHTML = '';
-    renderSearchResults(data);
+    searchView.render(data);
   } catch (err) {
     console.error(err);
   }
