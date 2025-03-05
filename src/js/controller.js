@@ -1,6 +1,10 @@
-const API_KEY = 'fa44fa6c-502e-4624-9e90-2f4c108b8361';
-const recipeContainer = document.querySelector('.recipe');
+import icons from 'url:../img/icons.svg';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 
+const API_KEY = 'fa44fa6c-502e-4624-9e90-2f4c108b8361';
+
+const recipeContainer = document.querySelector('.recipe');
 const searchInput = document.querySelector('.search__field');
 const searchBtn = document.querySelector('.search__btn');
 const searchResultsDiv = document.querySelector('.results');
@@ -8,13 +12,6 @@ const searchResultsDiv = document.querySelector('.results');
 const addRecipeBtn = document.querySelector('.nav__btn--add-recipe');
 const addRecipeDiv = document.querySelector('.add-recipe-window');
 const addRecipeCloseBtn = document.querySelector('.btn--close-modal');
-
-const figureDisplay = document.querySelector('.recipe__fig');
-const recipeDetailsDisplay = document.querySelector('.recipe__details');
-const recipeIngredientsDisplay = document.querySelector(
-  '.recipe__ingredient-list'
-);
-const recipeDirectionsDisplay = document.querySelector('.recipe__directions');
 
 const timeout = function (s) {
   return new Promise(function (_, reject) {
@@ -30,15 +27,18 @@ const timeout = function (s) {
 
 let searchResult;
 
-// Hide the recipe main display. Until the value is received.
-const changeOpacity = function (val) {
-  figureDisplay.style.opacity = val;
-  recipeDetailsDisplay.style.opacity = val;
-  recipeIngredientsDisplay.style.opacity = val;
-  recipeDirectionsDisplay.style.opacity = val;
-};
+const renderSpinner = function (parentEl) {
+  parentEl.innerHTML = '';
+  const markup = `
+  <div class='spinner'>
+    <svg>
+      <use href=${icons}#icon-loader></use>
+    </svg>
+  </div>
+  `;
 
-changeOpacity(0);
+  parentEl.insertAdjacentHTML('afterbegin', markup);
+};
 
 const getData = async function (item) {
   try {
@@ -82,6 +82,7 @@ const renderSearchResults = function (searchResult) {
 };
 
 const getRecipeDetails = async function (id) {
+  renderSpinner(recipeContainer);
   try {
     const res = await fetch(
       `https://forkify-api.herokuapp.com/api/v2/recipes/${id}`
@@ -99,93 +100,105 @@ const getRecipeDetails = async function (id) {
 };
 
 const renderFinalRecipe = function (recipe) {
-  changeOpacity(100);
+  // Set innerHTML of the main container
+  const markup = `
+    <div class="recipe__content">
+      <figure class="recipe__fig">
+        <img src="${recipe.image_url}" alt="${
+    recipe.title
+  }" class="recipe__img" />
+        <h1 class="recipe__title">
+          <span>${recipe.title}</span>
+        </h1>
+      </figure>
 
-  figureDisplay.innerHTML = `
-  
-          <img src="${recipe.image_url}" alt="${recipe.title}" class="recipe__img" />
-          <h1 class="recipe__title">
-            <span>${recipe.title}</span>
-          </h1>
-  `;
-
-  recipeDetailsDisplay.innerHTML = `
-  
-          <div class="recipe__info">
-            <svg class="recipe__info-icon">
-              <use href="src/img/icons.svg#icon-clock"></use>
-            </svg>
-            <span class="recipe__info-data recipe__info-data--minutes">${recipe.cooking_time}</span>
-            <span class="recipe__info-text">minutes</span>
-          </div>
-          <div class="recipe__info">
-            <svg class="recipe__info-icon">
-              <use href="src/img/icons.svg#icon-users"></use>
-            </svg>
-            <span class="recipe__info-data recipe__info-data--people">${recipe.servings}</span>
-            <span class="recipe__info-text">servings</span>
-
-            <div class="recipe__info-buttons">
-              <button class="btn--tiny btn--increase-servings">
-                <svg>
-                  <use href="src/img/icons.svg#icon-minus-circle"></use>
-                </svg>
-              </button>
-              <button class="btn--tiny btn--increase-servings">
-                <svg>
-                  <use href="src/img/icons.svg#icon-plus-circle"></use>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div class="recipe__user-generated">
-            <svg>
-              <use href="src/img/icons.svg#icon-user"></use>
-            </svg>
-          </div>
-          <button class="btn--round">
-            <svg class="">
-              <use href="src/img/icons.svg#icon-bookmark-fill"></use>
-            </svg>
-          </button>
-  `;
-  // putting this last because other ones are appeneded and this one is selected
-  recipe.ingredients.forEach(ingredient => {
-    const li = document.createElement('li');
-    li.classList.add('recipe__ingredient');
-    li.innerHTML = `
-              <svg class="recipe__icon">
-                <use href="src/img/icons.svg#icon-check"></use>
+      <div class="recipe__details">
+        <div class="recipe__info">
+          <svg class="recipe__info-icon">
+            <use href="${icons}#icon-clock"></use>
+          </svg>
+          <span class="recipe__info-data recipe__info-data--minutes">${
+            recipe.cooking_time
+          }</span>
+          <span class="recipe__info-text">minutes</span>
+        </div>
+        <div class="recipe__info">
+          <svg class="recipe__info-icon">
+            <use href="${icons}#icon-users"></use>
+          </svg>
+          <span class="recipe__info-data recipe__info-data--people">${
+            recipe.servings
+          }</span>
+          <span class="recipe__info-text">servings</span>
+          <div class="recipe__info-buttons">
+            <button class="btn--tiny btn--increase-servings">
+              <svg>
+                <use href="${icons}#icon-minus-circle"></use>
               </svg>
-              <div class="recipe__quantity">${ingredient.quantity}</div>
+            </button>
+            <button class="btn--tiny btn--increase-servings">
+              <svg>
+                <use href="${icons}#icon-plus-circle"></use>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="recipe__user-generated">
+          <svg>
+            <use href="${icons}#icon-user"></use>
+          </svg>
+        </div>
+        <button class="btn--round">
+          <svg>
+            <use href="${icons}#icon-bookmark-fill"></use>
+          </svg>
+        </button>
+      </div>
+
+      <div class="recipe__ingredients">
+        <h2 class="heading--2">Ingredients</h2>
+        <ul class="recipe__ingredient-list">
+          ${recipe.ingredients
+            .map(
+              ing => `
+            <li class="recipe__ingredient">
+              <svg class="recipe__icon">
+                <use href="${icons}#icon-check"></use>
+              </svg>
+              <div class="recipe__quantity">${ing.quantity || ''}</div>
               <div class="recipe__description">
-                <span class="recipe__unit">${ingredient.unit}</span>
-                ${ingredient.description}
+                <span class="recipe__unit">${ing.unit || ''}</span>
+                ${ing.description}
               </div>
-    `;
+            </li>
+          `
+            )
+            .join('')}
+        </ul>
+      </div>
 
-    recipeIngredientsDisplay.appendChild(li);
-  });
-
-  recipeDirectionsDisplay.innerHTML = `
-  <h2 class="heading--2">How to cook it</h2>
-          <p class="recipe__directions-text">
-            This recipe was carefully designed and tested by
-            <span class="recipe__publisher">${recipe.publisher}</span>. Please check out
-            directions at their website.
-          </p>
-          <a
-            class="btn--small recipe__btn"
-            href="${recipe.source_url}"
-            target="_blank"
-          >
-            <span>Directions</span>
-            <svg class="search__icon">
-              <use href="src/img/icons.svg#icon-arrow-right"></use>
-            </svg>
-          </a>
+      <div class="recipe__directions">
+        <h2 class="heading--2">How to cook it</h2>
+        <p class="recipe__directions-text">
+          This recipe was carefully designed and tested by
+          <span class="recipe__publisher">${
+            recipe.publisher
+          }</span>. Please check out
+          directions at their website.
+        </p>
+        <a class="btn--small recipe__btn" href="${
+          recipe.source_url
+        }" target="_blank">
+          <span>Directions</span>
+          <svg class="search__icon">
+            <use href="${icons}#icon-arrow-right"></use>
+          </svg>
+        </a>
+      </div>
+    </div>
   `;
+  recipeContainer.innerHTML = '';
+  recipeContainer.insertAdjacentHTML('afterbegin', markup);
 };
 
 /*
@@ -196,7 +209,7 @@ const renderError = function (error) {
   div.innerHTML = `
             <div>
               <svg>
-                <use href="src/img/icons.svg#icon-alert-triangle"></use>
+                <use href="${icons}#icon-alert-triangle"></use>
               </svg>
             </div>
             <p>${error}</p>`;
@@ -228,6 +241,7 @@ searchBtn.addEventListener('click', async function (e) {
   if (searchValue === '') return alert('Search field cannot be empty.');
 
   try {
+    renderSpinner(searchResultsDiv);
     searchResult = await getData(searchValue);
 
     // Clean search render before rendering new one
