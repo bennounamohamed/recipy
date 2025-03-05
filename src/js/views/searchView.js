@@ -6,7 +6,6 @@ class SearchView {
 
   render(data) {
     this.#data = data;
-    console.log(this.#data);
     this.#clear();
     this.#generateMarkup();
   }

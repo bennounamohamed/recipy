@@ -13,14 +13,6 @@ const addRecipeBtn = document.querySelector('.nav__btn--add-recipe');
 const addRecipeDiv = document.querySelector('.add-recipe-window');
 const addRecipeCloseBtn = document.querySelector('.btn--close-modal');
 
-const timeout = function (s) {
-  return new Promise(function (_, reject) {
-    setTimeout(function () {
-      reject(new Error(`Request took too long! Timeout after ${s} second`));
-    }, s * 1000);
-  });
-};
-
 // https://forkify-api.herokuapp.com/v2
 
 ///////////////////////////////////////
