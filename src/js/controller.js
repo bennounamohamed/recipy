@@ -6,7 +6,6 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
 const searchInput = document.querySelector('.search__field');
-const searchBtn = document.querySelector('.search__btn');
 const searchResultsDiv = document.querySelector('.results');
 
 const addRecipeBtn = document.querySelector('.nav__btn--add-recipe');
@@ -34,25 +33,18 @@ const controlRecipes = async function (id) {
 
 const getFinalRecipe = async function (target) {
   // Traverse up to find the closest <a> element
-  while (target && target.tagName !== 'A') {
-    target = target.parentElement;
-  }
+  const recipeLink = target.closest('a'); // Efficient way to find the nearest <a>
+  if (!recipeLink || !recipeLink.dataset.id) return;
 
-  if (target && target.dataset.id) {
-    const id = target.dataset.id;
-    controlRecipes(id);
-  } else {
-    console.error('<a> has no data-id attribute');
-  }
+  controlRecipes(recipeLink.dataset.id);
 };
 
-searchBtn.addEventListener('click', async function (e) {
+const searchRecipesHandler = async function (e) {
   e.preventDefault();
+  searchView.renderSpinner();
   // Get search input
   const searchValue = searchInput.value.trim();
   if (searchValue === '') return alert('Search field cannot be empty.');
-
-  searchView.renderSpinner();
 
   // Render Search Results
   try {
@@ -64,7 +56,18 @@ searchBtn.addEventListener('click', async function (e) {
   } catch (err) {
     console.error(err);
   }
-});
+};
+
+const displayRecipeHandler = function (e) {
+  e.preventDefault();
+  getFinalRecipe(e.target);
+};
+
+const init = function () {
+  searchView.addHandlerRender(searchRecipesHandler);
+  searchView.addHandlerRender(displayRecipeHandler);
+};
+init();
 
 addRecipeBtn.addEventListener('click', () => {
   addRecipeDiv.classList.remove('hidden');
@@ -72,9 +75,4 @@ addRecipeBtn.addEventListener('click', () => {
 
 addRecipeCloseBtn.addEventListener('click', () => {
   addRecipeDiv.classList.add('hidden');
-});
-
-searchResultsDiv.addEventListener('click', e => {
-  e.preventDefault();
-  getFinalRecipe(e.target);
 });

@@ -3,6 +3,8 @@ import icons from 'url:../../img/icons.svg';
 class SearchView {
   #parentElement = document.querySelector('.results');
   #data;
+  searchBtn = document.querySelector('.search__btn');
+  renderCondition = true; // To only render the spinner on the search results the first time (Better UI Experience)
 
   render(data) {
     this.#data = data;
@@ -14,16 +16,24 @@ class SearchView {
     this.#parentElement.innerHTML = '';
   }
 
+  addHandlerRender(handler) {
+    this.searchBtn.addEventListener('click', handler);
+    this.#parentElement.addEventListener('click', handler);
+  }
+
   renderSpinner() {
-    const markup = `
+    if (this.renderCondition) {
+      const markup = `
           <div class='spinner'>
             <svg>
-              <use href=${icons}#icon-loader></use>
+              <use href="${icons}#icon-loader"></use>
             </svg>
           </div>
           `;
-    this.#parentElement.innerHTML = '';
-    this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+      this.#clear();
+      this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+      this.renderCondition = false;
+    }
   }
 
   #generateMarkup() {
