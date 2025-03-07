@@ -1,6 +1,6 @@
 import icons from 'url:../../img/icons.svg';
 
-class View {
+export default class View {
   _data;
 
   render(data) {
@@ -40,5 +40,3 @@ class View {
     this._parentElement.insertAdjacentHTML('afterbegin', markup);
   }
 }
-
-export default View;

@@ -5,6 +5,10 @@ import searchView from './views/searchView.js';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
+if (module.hot) {
+  module.hot.accept();
+}
+
 const controlSearchResults = async function (e) {
   e.preventDefault();
   try {
@@ -58,7 +62,7 @@ const controlRecipe = async function (id) {
 };
 
 const init = function () {
-  searchView.addHandlerSearchRender(controlSearchResults);
-  searchView.addHandlerSearchRender(displayRecipeHandler);
+  searchView.addHandlerSearch(controlSearchResults);
+  searchView.addHandlerRender(displayRecipeHandler);
 };
 init();
