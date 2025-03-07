@@ -15,7 +15,41 @@ const addRecipeCloseBtn = document.querySelector('.btn--close-modal');
 
 ///////////////////////////////////////
 
-const controlRecipes = async function (id) {
+const controlSearchResults = async function (e) {
+  e.preventDefault();
+  try {
+    // Get search input
+    const searchQuery = searchInput.value.trim();
+    if (searchQuery === '') throw new Error('Search field cannot be empty.');
+
+    // Render Search Results
+
+    searchView.renderSpinner();
+    await model.loadSearchResults(searchQuery);
+    const data = model.state.searchResults.resultsArr;
+    if (!data) throw new Error('Failed to get recipes from the server.');
+    searchView.render(data);
+  } catch (err) {
+    searchView.renderError(err.message);
+  }
+};
+
+// get clicked recipe from search results.
+const getRecipeHandler = async function (target) {
+  // Traverse up to find the closest <a> element
+  const recipeLink = target.closest('a'); // Efficient way to find the nearest <a>
+  if (!recipeLink || !recipeLink.dataset.id) return;
+
+  controlRecipe(recipeLink.dataset.id);
+};
+
+// declaring a seperate function with arguments to use it on the addHandlerRender Helper function.
+const displayRecipeHandler = function (e) {
+  e.preventDefault();
+  getRecipeHandler(e.target);
+};
+
+const controlRecipe = async function (id) {
   recipeView.renderSpinner();
   // Load Recipe
   try {
@@ -30,40 +64,8 @@ const controlRecipes = async function (id) {
   }
 };
 
-const getFinalRecipe = async function (target) {
-  // Traverse up to find the closest <a> element
-  const recipeLink = target.closest('a'); // Efficient way to find the nearest <a>
-  if (!recipeLink || !recipeLink.dataset.id) return;
-
-  controlRecipes(recipeLink.dataset.id);
-};
-
-const searchRecipesHandler = async function (e) {
-  e.preventDefault();
-  try {
-    // Get search input
-    const searchValue = searchInput.value.trim();
-    if (searchValue === '') throw new Error('Search field cannot be empty.');
-
-    // Render Search Results
-
-    searchView.renderSpinner();
-    await model.loadSearchResults(searchValue);
-    const data = model.state.searchResults.resultsArr;
-    if (!data) throw new Error('Failed to get recipes from the server.');
-    searchView.render(data);
-  } catch (err) {
-    searchView.renderError(err.message);
-  }
-};
-
-const displayRecipeHandler = function (e) {
-  e.preventDefault();
-  getFinalRecipe(e.target);
-};
-
 const init = function () {
-  searchView.addHandlerRender(searchRecipesHandler);
+  searchView.addHandlerRender(controlSearchResults);
   searchView.addHandlerRender(displayRecipeHandler);
 };
 init();
