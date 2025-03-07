@@ -15,8 +15,7 @@ export const loadRecipe = async function (id) {
 
     state.recipe = data.data;
   } catch (err) {
-    alert(err);
-    return null;
+    throw err;
   }
 };
 
@@ -32,6 +31,6 @@ export const getData = async function (item) {
     if (state.searchResults.length === 0)
       throw new Error('Invalid search Term, please try again!');
   } catch (err) {
-    alert(err);
+    throw err;
   }
 };

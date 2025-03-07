@@ -27,6 +27,22 @@ class RecipeView {
     this.#parentElement.insertAdjacentHTML('afterbegin', markup);
   }
 
+  renderError() {
+    const markup = `
+      <div class="error">
+        <div>
+           <svg>
+             <use href="${icons}#icon-alert-triangle"></use>
+          </svg>
+        </div>
+          <p>No recipes found for your query. Please try again!</p>
+      </div>
+    `;
+
+    this.#clear();
+    this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+  }
+
   #generateMarkup() {
     return `
     <div class="recipe__content">

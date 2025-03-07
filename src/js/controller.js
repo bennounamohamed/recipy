@@ -6,7 +6,6 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
 const searchInput = document.querySelector('.search__field');
-const searchResultsDiv = document.querySelector('.results');
 
 const addRecipeBtn = document.querySelector('.nav__btn--add-recipe');
 const addRecipeDiv = document.querySelector('.add-recipe-window');
@@ -27,7 +26,7 @@ const controlRecipes = async function (id) {
     // Render Recipe
     recipeView.render(recipe);
   } catch (err) {
-    console.log(err);
+    recipeView.renderError(err.message);
   }
 };
 
@@ -54,7 +53,7 @@ const searchRecipesHandler = async function (e) {
 
     searchView.render(data);
   } catch (err) {
-    console.error(err);
+    searchView.renderError(err.message);
   }
 };
 
