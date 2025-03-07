@@ -5,29 +5,22 @@ import searchView from './views/searchView.js';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
-const searchInput = document.querySelector('.search__field');
-
-const addRecipeBtn = document.querySelector('.nav__btn--add-recipe');
-const addRecipeDiv = document.querySelector('.add-recipe-window');
-const addRecipeCloseBtn = document.querySelector('.btn--close-modal');
-
-// https://forkify-api.herokuapp.com/v2
-
-///////////////////////////////////////
-
 const controlSearchResults = async function (e) {
   e.preventDefault();
   try {
     // Get search input
-    const searchQuery = searchInput.value.trim();
-    if (searchQuery === '') throw new Error('Search field cannot be empty.');
-
-    // Render Search Results
+    const searchQuery = searchView.getQuery();
+    if (!searchQuery) throw new Error('Search field cannot be empty.');
 
     searchView.renderSpinner();
+
+    // Get Search Results
+
     await model.loadSearchResults(searchQuery);
-    const data = model.state.searchResults.resultsArr;
+    const data = model.state.search.resultsArr;
     if (!data) throw new Error('Failed to get recipes from the server.');
+
+    // Render Search Results
     searchView.render(data);
   } catch (err) {
     searchView.renderError(err.message);
@@ -65,15 +58,7 @@ const controlRecipe = async function (id) {
 };
 
 const init = function () {
-  searchView.addHandlerRender(controlSearchResults);
-  searchView.addHandlerRender(displayRecipeHandler);
+  searchView.addHandlerSearchRender(controlSearchResults);
+  searchView.addHandlerSearchRender(displayRecipeHandler);
 };
 init();
-
-addRecipeBtn.addEventListener('click', () => {
-  addRecipeDiv.classList.remove('hidden');
-});
-
-addRecipeCloseBtn.addEventListener('click', () => {
-  addRecipeDiv.classList.add('hidden');
-});

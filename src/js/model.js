@@ -4,7 +4,7 @@ import { getJSON } from './helpers.js';
 
 export const state = {
   recipe: {},
-  searchResults: {
+  search: {
     resultsArr: [],
   },
 };
@@ -29,10 +29,10 @@ export const loadSearchResults = async function (query) {
 
     if (!data) throw new Error('Cannot get search results Data.');
 
-    state.searchResults.resultsArr = data.data.recipes;
+    state.search.resultsArr = data.data.recipes;
 
     // checks if query is incorrect or does not exist
-    if (state.searchResults.resultsArr.length === 0) {
+    if (state.search.resultsArr.length === 0) {
       throw new Error('Invalid search Term, please try again!');
     }
   } catch (err) {

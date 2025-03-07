@@ -1,74 +1,51 @@
-import icons from 'url:../../img/icons.svg';
+import View from './View.js';
 
-class SearchView {
-  #parentElement = document.querySelector('.results');
-  #data;
+class SearchView extends View {
+  _parentElement = document.querySelector('.results');
+  searchForm = document.querySelector('.search');
   searchBtn = document.querySelector('.search__btn');
-  renderCondition = true; // To only render the spinner on the search results the first time (Better UI Experience)
+  renderCondition = true;
 
-  render(data) {
-    this.#data = data;
-    this.#clear();
-    this.#generateMarkup();
+  addHandlerSearchRender(handler) {
+    this.searchForm.addEventListener('submit', handler);
+    this._parentElement.addEventListener('click', handler);
   }
 
-  #clear() {
-    this.#parentElement.innerHTML = '';
+  getQuery() {
+    // We get query & then clear the field & then return query.
+    const query = this.searchForm.querySelector('.search__field').value.trim();
+    this.#clearInput();
+    return query;
   }
 
-  addHandlerRender(handler) {
-    this.searchBtn.addEventListener('click', handler);
-    this.#parentElement.addEventListener('click', handler);
+  #clearInput() {
+    this.searchForm.querySelector('.search__field').value = '';
   }
 
   renderSpinner() {
     if (this.renderCondition) {
-      const markup = `
-          <div class='spinner'>
-            <svg>
-              <use href="${icons}#icon-loader"></use>
-            </svg>
-          </div>
-          `;
-      this.#clear();
-      this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+      super.renderSpinner(); // Use parent method
       this.renderCondition = false;
     }
   }
 
-  renderError() {
-    const markup = `
-      <div class="error">
-        <div>
-           <svg>
-             <use href="${icons}#icon-alert-triangle"></use>
-          </svg>
-        </div>
-          <p>No recipes found for your query. Please try again!</p>
-      </div>
-    `;
-
-    this.#clear();
-    this.#parentElement.insertAdjacentHTML('afterbegin', markup);
-  }
-
-  #generateMarkup() {
-    if (!this.#data) return;
-    this.#data.forEach(item => {
+  generateMarkup() {
+    if (!this._data) return;
+    this._data.forEach(item => {
       const li = document.createElement('li');
       li.classList = 'preview';
       li.innerHTML = ` 
-                    <a class="preview__link preview__link--active" href="#23232" data-id=${item.id}>
-                      <figure class="preview__fig">
-                        <img src=${item.image_url} alt="Test" />
-                      </figure>
-                      <div class="preview__data">
-                        <h4 class="preview__title">${item.title}</h4>
-                        <p class="preview__publisher">${item.publisher}</p>
-                      </div>
-                    </a>
-                   `;
-      this.#parentElement.appendChild(li);
+        <a class="preview__link preview__link--active" href="#23232" data-id=${item.id}>
+          <figure class="preview__fig">
+            <img src=${item.image_url} alt="Test" />
+          </figure>
+          <div class="preview__data">
+            <h4 class="preview__title">${item.title}</h4>
+            <p class="preview__publisher">${item.publisher}</p>
+          </div>
+        </a>
+      `;
+      this._parentElement.appendChild(li);
     });
   }
 }
