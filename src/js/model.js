@@ -4,7 +4,9 @@ import { getJSON } from './helpers.js';
 
 export const state = {
   recipe: {},
-  searchResults: [],
+  searchResults: {
+    resultsArr: [],
+  },
 };
 
 export const loadRecipe = async function (id) {
@@ -15,22 +17,26 @@ export const loadRecipe = async function (id) {
 
     state.recipe = data.data;
   } catch (err) {
+    console.log(err);
     throw err;
   }
 };
 
-export const getData = async function (item) {
+export const loadSearchResults = async function (query) {
   try {
     // get data from api and resolve it using helper function getJSON
-    const data = await getJSON(`${API_URL}?search=${item}&key=${API_KEY}`);
+    const data = await getJSON(`${API_URL}?search=${query}&key=${API_KEY}`);
 
     if (!data) throw new Error('Cannot get search results Data.');
 
-    state.searchResults = data.data.recipes;
+    state.searchResults.resultsArr = data.data.recipes;
 
-    if (state.searchResults.length === 0)
+    // checks if query is incorrect or does not exist
+    if (state.searchResults.resultsArr.length === 0) {
       throw new Error('Invalid search Term, please try again!');
+    }
   } catch (err) {
+    console.log(err);
     throw err;
   }
 };

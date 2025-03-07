@@ -40,17 +40,17 @@ const getFinalRecipe = async function (target) {
 
 const searchRecipesHandler = async function (e) {
   e.preventDefault();
-  searchView.renderSpinner();
-  // Get search input
-  const searchValue = searchInput.value.trim();
-  if (searchValue === '') return alert('Search field cannot be empty.');
-
-  // Render Search Results
   try {
-    await model.getData(searchValue);
-    const data = model.state.searchResults;
-    if (!data) throw new Error('Failed to get recipes from the server.');
+    // Get search input
+    const searchValue = searchInput.value.trim();
+    if (searchValue === '') throw new Error('Search field cannot be empty.');
 
+    // Render Search Results
+
+    searchView.renderSpinner();
+    await model.loadSearchResults(searchValue);
+    const data = model.state.searchResults.resultsArr;
+    if (!data) throw new Error('Failed to get recipes from the server.');
     searchView.render(data);
   } catch (err) {
     searchView.renderError(err.message);
